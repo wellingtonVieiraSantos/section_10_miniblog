@@ -49,6 +49,7 @@ const Login = () => {
                     onChange={e => (setEmail(e.target.value))}
                 />
             </label>
+            {error.includes('Usuário') && <p className='error'>{error}</p>}
             <label>
                 <span>Senha:</span>
                 <input 
@@ -60,10 +61,11 @@ const Login = () => {
                     onChange={e => (setPassword(e.target.value))}
                 />
             </label>
+            {error.includes('Senha') && <p className='error'>{error}</p>}
 
             {!loading && <button className='btn'>Entrar</button>}
             {loading && <button className='btn' disabled>Aguarde...</button>}
-            {error && <p className='error'>{error}</p>}
+            {error.includes('erro') && <p className='error'>{error}</p>}
         </form>
 
     </div>

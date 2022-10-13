@@ -67,6 +67,7 @@ const Register = () => {
                     onChange={e => (setEmail(e.target.value))}
                 />
             </label>
+            {error.includes('mail') && <p className='error'>{error}</p>}
             <label>
                 <span>Senha:</span>
                 <input 
@@ -78,6 +79,7 @@ const Register = () => {
                     onChange={e => (setPassword(e.target.value))}
                 />
             </label>
+            {error.includes('senha') && <p className='error'>{error}</p>}
             <label>
                 <span>Confirmação de senha:</span>
                 <input 
@@ -89,9 +91,10 @@ const Register = () => {
                     onChange={e => (setConfirmPassword(e.target.value))}
                 />
             </label>
+            {error.includes('senha') && <p className='error'>{error}</p>}
             {!loading && <button className='btn'>Cadastrar</button>}
             {loading && <button className='btn' disabled>Aguarde...</button>}
-            {error && <p className='error'>{error}</p>}
+            {error.includes('erro') && <p className='error'>{error}</p>}
         </form>
 
     </div>

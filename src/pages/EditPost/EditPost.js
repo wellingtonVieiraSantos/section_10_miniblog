@@ -1,11 +1,14 @@
-import styles from './CreatePost.module.css'
+import styles from './EditPost.module.css'
 
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthValue } from '../../context/AuthContext'
-import { useInsertDocument } from '../../hooks/useInsertDocument'
+import { useUpdateDocument } from '../../hooks/useUpdateDocument'
+import { useFetchDocument } from '../../hooks/useFetchDocument'
 
-const CreatePost = () => {
+const EditPost = () => {
+  const {id} = useParams()
+  const { document: post } = useFetchDocument('posts', id)
 
   const [title, setTitle] = useState('')
   const [image, setImage] = useState('')
@@ -13,11 +16,21 @@ const CreatePost = () => {
   const [tags, setTags] = useState([])
   const [formError, setFormError] = useState('')
 
+  useEffect(()=>{
+    if(post){
+      setTitle(post.title)
+      setBody(post.body)
+      setImage(post.image)
+      const textTags = post.tagsArray.join(', ')
+      setTags(textTags)
+    }
+  },[post])
+
   const { user } = useAuthValue()
 
   const navigate = useNavigate()
 
-  const {insertDocument, response} = useInsertDocument('posts')
+  const { updateDocument, response} = useUpdateDocument('posts')
 
   const handleSubmit = e =>{
     e.preventDefault()
@@ -41,23 +54,27 @@ const CreatePost = () => {
 
     if (formError) return;
 
-    insertDocument({
+    const data = {
       title,
       image,
       body,
       tagsArray,
       uid: user.uid,
       createdBy: user.displayName
-    })
+    }
+
+    updateDocument(id, data)
 
     //redirect to home page
-    navigate('/')
+    navigate('/dashboard')
   }
 
   return (
-    <div className={styles.create_post}>
-      <h2>Criar post</h2>
-      <p>Escreva sobre o que quiser e compartilhe!</p>
+    <div className={styles.edit_post}>
+      {post && (
+        <>
+          <h2>Editando post: {post.title}</h2>
+      <p>Altere os dados do post como preferir</p>
         <form onSubmit={handleSubmit}>
           <label>
             <span>Título</span>
@@ -81,6 +98,8 @@ const CreatePost = () => {
               value={image}
               />
           </label>
+          <p className={styles.preview_title}>Preview da imagem:</p>
+          <img className={styles.preview_image} src={post.image} alt={post.title} />
           <label>
             <span>Conteúdo:</span>
             <textarea 
@@ -103,13 +122,15 @@ const CreatePost = () => {
               value={tags}
               />
           </label>
-          {!response.loading && <button className='btn'>Cadastrar</button>}
+          {!response.loading && <button className='btn'>Editar</button>}
             {response.loading && <button className='btn' disabled>Aguarde...</button>}
             {response.error && <p className='error'>{response.error}</p>}
             {formError && <p className='error'>{formError}</p>}
         </form>
+        </>
+      )}
     </div>
   )
 }
 
-export default CreatePost
+export default EditPost
